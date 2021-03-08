@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Take A Test</title>
+	<link rel="stylesheet" href="/static/css/bootstrap.min.css">
+    <meta name="description" content="">
+    <meta name="keywords" content="">
+    <meta name="author" content="">
+</head>
+<body>
+
+<div class="row container">
+ <div class="col-lg-3">
+      <br />
+      <div class="card border-danger mb-5">
+      <div class="card-header">System Info</div>
+      <div class="card-body">
+        <p class="card-text"><div id="os_info"></div></p>
+      </div>
+    </div>
+  </div>
+ <div class="col-lg-3">
+     <br />
+    <div class="card border-danger mb-5">
+      <div class="card-header">Network</div>
+      <div class="card-body">
+        <p class="card-text"><div id="mac_address"></div></p>
+      </div>
+    </div>
+ </div>
+  <div class="col-lg-5">
+      <br />
+      <div class="card border-danger mb-5">
+      <div class="card-header">Processes</div>
+      <div class="card-body">
+        <p class="card-text"><div id="process_list"></div></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row container">
+  <div class="col-lg-2">
+      <br />
+      <div class="card border-danger mb-5">
+      <div class="card-header">Virtual Machine</div>
+      <div class="card-body">
+        <p class="card-text"><div id="virtual_machine"></div></p>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-2">
+      <br />
+      <div class="card border-danger mb-5">
+      <div class="card-header">Remote Session</div>
+      <div class="card-body">
+        <p class="card-text"><div id="remote_session"></div></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="/static/js/jquery-3.5.1.min.js"></script>
+<script src="/static/js/bootstrap.bundle.min.js"></script>
+<script>
+    const processes = function (found_processes) {
+         $.ajax({
+                url: '/process_list/',
+                type: 'POST',
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify({ 'found_processes': found_processes }),
+                success:function(data){
+                    $("#process_list").html(data);
+                },
+                cache: false,
+                processData: false
+        });
+    }
+
+    const mac = function (mac_address) {
+        $.get("/mac_address/" + mac_address, function (data, status) { $("#mac_address").html(data); });
+    }
+
+    const os = function (os_info) {
+         $.ajax({
+                url: '/os_info/',
+                type: 'POST',
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify({ 'os_info': os_info }),
+                success:function(data){
+                    $("#os_info").html(data);
+                },
+                cache: false,
+                processData: false
+        });
+    }
+
+    SecureBrowser.security.examineProcessList({{ all_processes|safe }}, processes);
+
+    SecureBrowser.security.getDeviceInfo(os);
+
+    SecureBrowser.security.getMACAddress(mac);
+
+    if(SecureBrowser.security.isVMSession()){
+        $.get("/virtual_machine/1", function (data, status) { $("#virtual_machine").html(data); });
+    }else{
+        $.get("/virtual_machine/0", function (data, status) { $("#virtual_machine").html(data); });
+    }
+
+    if(SecureBrowser.security.isRemoteSession()){
+        $.get("/remote_session/1", function (data, status) { $("#remote_session").html(data); });
+    }else{
+        $.get("/remote_session/0", function (data, status) { $("#remote_session").html(data); });
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,16 @@
+<table class="table table-hover">
+  <thead>
+    <tr>
+      <th scope="col">Process</th>
+      <th scope="col">Category</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for proc in procs %}
+      <tr>
+      <td>{{ proc["process"] }}</td>
+      <td>{{ proc["cat"] }}</td>
+      </tr>
+  {% endfor %}
+  </tbody>
+</table>
